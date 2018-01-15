@@ -19,3 +19,15 @@ Obviously, slower than this 😅
 Animating anything outside the layout properties might have some performance implications you need to keep present at all times.
 
 For instance, when we animate the `flex` property in the style, `react native` will have to recalculate the layout for us and rerender it and unfortunatelly, that property has not been optimised with the native renderer that can be turned on by calling `useNativeDriver` as documented [here](https://facebook.github.io/react-native/docs/animations.html). So, limit the number of animations you trigger using this method and your application is going to be happy Jan.
+
+## How do I run this code?
+
+Once you have cloned it:
+
+```sh
+# Assuming you are in the project root directory.
+yarn # if you do not have yarn installed, then run: > npm install
+./node_modules/.bin/tsc
+```
+
+That script will compile the typescript code and generate your `lib/` folder with the `index.js` script required to run it. Then just do `react-native run-ios` or `react-native run-android` based on your wishes.
