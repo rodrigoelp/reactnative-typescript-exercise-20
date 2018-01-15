@@ -1,6 +1,9 @@
 import * as React from "react";
 import { AppRegistry, View, Text, Animated, StyleSheet, TouchableWithoutFeedback } from "react-native";
 
+/** 
+ * Defining all the colours used by the application.
+*/
 enum Colors {
     Foreground = "white",
     FirstBox = "#5c97ea",
@@ -11,6 +14,9 @@ enum Colors {
     ThirdBoxSeparator = "#4c918e",
 }
 
+/**
+ * Enumeration to track the section to expand or collapse.
+*/
 enum Section {
     None,
     Top,
@@ -18,11 +24,14 @@ enum Section {
     Bottom
 }
 
+/**
+ * Application styles.
+*/
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 30, alignContent: "center", justifyContent: "center" },
     title: { fontWeight: "bold", fontSize: 24, color: Colors.Foreground },
-    box: { minHeight: 100 },
-    sectionBox: { flexGrow: 1, minHeight: 100 },
+    box: { minHeight: 100 }, // Notice it does not define flex
+    sectionBox: { flexGrow: 1, minHeight: 100 }, // notice it does not define flex.
     topSectionBox: { borderTopLeftRadius: 8, borderTopRightRadius: 8 },
     bottomSectionBox: { borderBottomLeftRadius: 8, borderBottomRightRadius: 8 },
     firstBox: { backgroundColor: Colors.FirstBoxSeparator },
@@ -33,12 +42,17 @@ const styles = StyleSheet.create({
     thirdInnerBox: { backgroundColor: Colors.ThirdBox, marginBottom: 10, padding: 10 },
 });
 
+// This is just a type to define the property I expect in the App component.
 interface AppState {
     expandedSection: Section;
 }
 
+/** 
+ * Component expanding/collapsing sections as displayed by it.
+*/
 class App extends React.PureComponent<{}, AppState> {
 
+    // Properties used to generate the animation
     private _topFlexValue: Animated.Value;
     private _middleFlexValue: Animated.Value;
     private _bottomFlexValue: Animated.Value;
@@ -48,15 +62,18 @@ class App extends React.PureComponent<{}, AppState> {
 
         this.state = { expandedSection: Section.None };
 
+        // setting the initial value for each animation property.
         this._topFlexValue = new Animated.Value(0);
         this._middleFlexValue = new Animated.Value(0);
         this._bottomFlexValue = new Animated.Value(0);
 
+        // generating the performant binding call to a method.
         this.selectedSection = this.selectedSection.bind(this);
     }
 
     public render() {
         const config = { inputRange: [0, 1], outputRange: [0, 1] };
+        // generating the observer that reacts to changes of the animation properties.
         const topValue = this._topFlexValue.interpolate(config);
         const midValue = this._middleFlexValue.interpolate(config);
         const bottomValue = this._bottomFlexValue.interpolate(config);
@@ -87,6 +104,10 @@ class App extends React.PureComponent<{}, AppState> {
         );
     }
 
+    /**
+     * Either selects or unselects a section based on the which elements was tapped on.
+     * @param section Section to expand or collapse
+     */
     private selectedSection(section: Section) {
         let toTop = 0, toMid = 0, toBottom = 0;
         if (this.state.expandedSection !== section) {
@@ -98,6 +119,8 @@ class App extends React.PureComponent<{}, AppState> {
         } else {
             section = Section.None;
         }
+        // Once we know where we are going to go, all we need is to animate
+        // in parallel all the boxes. Those that are already on 0 will not change.
         Animated.parallel([
             Animated.timing(this._topFlexValue, { toValue: toTop, duration: 500 }),
             Animated.timing(this._middleFlexValue, { toValue: toMid, duration: 500 }),
