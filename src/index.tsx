@@ -12,6 +12,7 @@ enum Colors {
 }
 
 enum Section {
+    None,
     Top,
     Mid,
     Bottom
@@ -32,7 +33,11 @@ const styles = StyleSheet.create({
     thirdInnerBox: { backgroundColor: Colors.ThirdBox, marginBottom: 10, padding: 10 },
 });
 
-class App extends React.PureComponent {
+interface AppState {
+    expandedSection: Section;
+}
+
+class App extends React.PureComponent<{}, AppState> {
 
     private _topFlexValue: Animated.Value;
     private _middleFlexValue: Animated.Value;
@@ -40,6 +45,8 @@ class App extends React.PureComponent {
 
     constructor(props: any) {
         super(props);
+
+        this.state = { expandedSection: Section.None };
 
         this._topFlexValue = new Animated.Value(0);
         this._middleFlexValue = new Animated.Value(0);
@@ -82,16 +89,23 @@ class App extends React.PureComponent {
 
     private selectedSection(section: Section) {
         let toTop = 0, toMid = 0, toBottom = 0;
-        switch (section) {
-            case Section.Top: toTop = 1; break;
-            case Section.Mid: toMid = 1; break;
-            default: toBottom = 1; break;
+        if (this.state.expandedSection !== section) {
+            switch (section) {
+                case Section.Top: toTop = 1; break;
+                case Section.Mid: toMid = 1; break;
+                default: toBottom = 1; break;
+            }
+        } else {
+            section = Section.None;
         }
         Animated.parallel([
             Animated.timing(this._topFlexValue, { toValue: toTop, duration: 500 }),
             Animated.timing(this._middleFlexValue, { toValue: toMid, duration: 500 }),
             Animated.timing(this._bottomFlexValue, { toValue: toBottom, duration: 500 }),
-        ]).start();
+        ]).start(
+            () => {
+                this.setState({ ...this.state, expandedSection: section });
+            });
     }
 }
 
